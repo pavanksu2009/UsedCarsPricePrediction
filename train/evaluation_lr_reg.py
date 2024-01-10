@@ -1,14 +1,13 @@
 import os
 import json
 import joblib
-import tarfile
 
 import pandas as pd
 
 from sklearn.metrics import mean_squared_error, r2_score
 
 # model_path for used_cars.csv from local machine
-model_path = f"../UsedCarsPricePrediction/model/model_dtr.joblib"
+model_path = f"../UsedCarsPricePrediction/model/model_lr_reg.joblib"
 model = joblib.load(model_path)
 
 print("Loading test input data")
@@ -24,7 +23,6 @@ y_pred = model.predict(X_test)
 
 print(f"RMSE: {mean_squared_error(y_test, y_pred, squared=False)};")
 print(f"R2: {r2_score(y_test, y_pred)};")
-
 report_dict = {
         "regression_metrics": {
                 "mse": {
@@ -40,7 +38,7 @@ report_dict = {
 }
 
 # evaluation_output_path for used_cars.csv from local machine
-evaluation_output_path = os.path.join("../UsedCarsPricePrediction/evaluation", "evaluation_dtr.json")
+evaluation_output_path = os.path.join("../UsedCarsPricePrediction/evaluation", "evaluation_lr_reg.json")
 
 with open(evaluation_output_path, "w") as f:
       f.write(json.dumps(report_dict))

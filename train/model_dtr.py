@@ -43,7 +43,7 @@ print(f"Training Accuracy: {model_dt.score(X_train, y_train)}")
 print(f"Validation Accuracy: {model_dt.score(X_val, y_val)}")
 
 # model_output_directory for used_cars.csv from local machine
-model_output_directory = os.path.join("../UsedCarsPricePrediction/model", "model.joblib")
+model_output_directory = os.path.join("../UsedCarsPricePrediction/model", "model_dtr.joblib")
 
 print(f"Saving model to {model_output_directory}")
 joblib.dump(model_dt, model_output_directory)

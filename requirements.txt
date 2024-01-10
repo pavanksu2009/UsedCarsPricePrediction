@@ -5,5 +5,4 @@ seaborn
 scikit-learn
 scipy
 ipykernel
-pymc3
-theano
+xgboost

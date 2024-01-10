@@ -1,61 +1,49 @@
-
-# import mlflow
-import argparse
+import os
+import joblib
 
 import pandas as pd
 
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.pipeline import make_pipeline
-from sklearn.compose import make_column_transformer
-
-from sklearn.model_selection import train_test_split
-
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
-# mlflow.start_run()
 
-def main():
-    
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--data", type=str, help="path to train data")
-    
-        args = parser.parse_args()
-    
-        df = pd.read_csv(args.data)
-        
-        target = 'price'
-        numeric_features = ['Segment','Kilometers_Driven', 'Mileage', 'Engine','Power','Seats']
-        categorical_features = []
-    
-        X = df.drop([target], axis=1)
-        y = df[target]
-    
-        X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-        )
+# training_data_directory for used_cars.csv from local machine
+training_data_directory = "../UsedCarsPricePrediction/train"
+# validation_data_directory for used_cars.csv from local machine
+validation_data_directory = "../UsedCarsPricePrediction/train"
+# test_data_directory for used_cars.csv from local machine
+test_data_directory = "../UsedCarsPricePrediction/test"
 
-        # split the training data into train and validation sets
-        X_train, X_val, y_train, y_val = train_test_split(
-        X_train, y_train, test_size=0.2, random_state=42
-        )
-    
-        model_lr = LinearRegression()
-    
-        model_pipeline = make_pipeline(model_lr)
-    
-        model_pipeline.fit(X_train, y_train)
-    
-        # print training accuracy and R2 score
-        print("training accuracy:", model_pipeline.score(X_train, y_train))
-        print("training R2 score:", model_pipeline.score(X_train, y_train))
+train_features_data = os.path.join(training_data_directory, "train_features.csv") # this
+train_labels_data = os.path.join(training_data_directory, "train_labels.csv")
 
-        # print validation accuracy and R2 score
-        print("validation accuracy:", model_pipeline.score(X_val, y_val))
-        print("validation R2 score:", model_pipeline.score(X_val, y_val))
-        
-        # print test accuracy and R2 score
-        print("test accuracy:", model_pipeline.score(X_test, y_test))
-        print("test R2 score:", model_pipeline.score(X_test, y_test))
+val_features_data = os.path.join(validation_data_directory, "val_features.csv")
+val_labels_data = os.path.join(validation_data_directory, "val_labels.csv")
 
-if __name__ == '__main__':
-    main()
+test_features_data = os.path.join(test_data_directory, "test_features.csv")
+test_labels_data = os.path.join(test_data_directory, "test_labels.csv")
+
+X_train = pd.read_csv(train_features_data, header=None)
+y_train = pd.read_csv(train_labels_data, header=None)
+
+model_lr = LinearRegression()
+
+model_lr.fit(X_train, y_train)
+
+# X_test = pd.read_csv(test_features_data, header=None)
+X_val = pd.read_csv(val_features_data, header=None)
+y_val = pd.read_csv(val_labels_data, header=None)
+
+y_pred_val = model_lr.predict(X_val)
+
+# print(f"RMSE: {mean_squared_error(y_test, y_pred, squared=False)};")
+print(f"RMSE: {mean_squared_error(y_val, y_pred_val, squared=False)};")
+# print accuracy score on the training and validation sets
+print(f"Training Accuracy: {model_lr.score(X_train, y_train)}")
+print(f"Validation Accuracy: {model_lr.score(X_val, y_val)}")
+
+# model_output_directory for used_cars.csv from local machine
+model_output_directory = os.path.join("../UsedCarsPricePrediction/model", "model_lr.joblib")
+
+print(f"Saving model to {model_output_directory}")
+joblib.dump(model_lr, model_output_directory)
